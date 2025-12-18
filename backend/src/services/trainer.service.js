@@ -1,4 +1,4 @@
-const trainerRepo = require('../repositories/trainer.repository');
+import trainerRepo from '../repositories/trainer.repository.js';
 
 const createTrainer = ({ name, specialty }) => {
   if (!name || !specialty) {
@@ -12,7 +12,7 @@ const getAllTrainers = () => {
   return trainerRepo.getAllTrainers();
 };
 
-module.exports = {
+export default {
   createTrainer,
   getAllTrainers,
 };

@@ -1,18 +1,40 @@
 import prisma from '../utils/prisma.js'
 
-export const createClient = (data) => {
-  return prisma.client.create({ data });
-};
+class ClientRepository {
+  async create(data) {
+    return prisma.client.create({
+      data,
+    })
+  }
 
-export const getAllClients = () => {
-  return prisma.client.findMany({
-    include: { trainer: true }
-  });
-};
+  async findAll() {
+    return prisma.client.findMany()
+  }
 
-export const getClientById = (id) => {
-  return prisma.client.findUnique({
-    where: { id },
-    include: { subscriptions: true }
-  });
-};
+  async findById(id) {
+    return prisma.client.findUnique({
+      where: { id },
+    })
+  }
+
+  async findByEmail(email) {
+    return prisma.client.findUnique({
+      where: { email },
+    })
+  }
+
+  async update(id, data) {
+    return prisma.client.update({
+      where: { id },
+      data,
+    })
+  }
+
+  async delete(id) {
+    return prisma.client.delete({
+      where: { id },
+    })
+  }
+}
+
+export default new ClientRepository()

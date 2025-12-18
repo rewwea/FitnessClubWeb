@@ -1,8 +1,9 @@
-const express = require('express');
+import express from 'express';
+import trainerController from '../controllers/trainer.controller.js';
+
 const router = express.Router();
-const trainerController = require('../controllers/trainer.controller');
 
 router.post('/', trainerController.createTrainer);
 router.get('/', trainerController.getAllTrainers);
 
-module.exports = router;
+export default router;

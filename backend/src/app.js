@@ -1,15 +1,16 @@
-const express = require('express');
+import express from 'express'
+import clientRoutes from './routes/client.routes.js'
+import trainerRoutes from './routes/trainer.routes.js'
 
-const app = express();
+const app = express()
 
-app.use(express.json());
-
-const trainerRoutes = require('./routes/trainer.routes');
-
-app.use('/api/trainers', trainerRoutes);
+app.use(express.json())
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
+  res.json({ status: 'ok' })
+})
 
-module.exports = app;
+app.use('/clients', clientRoutes)
+app.use('/api/trainers', trainerRoutes)
+
+export default app

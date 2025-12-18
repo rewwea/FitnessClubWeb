@@ -1,42 +1,53 @@
-import * as clientRepo from '../repositories/client.repository.js'
-import * as trainerRepo from '../repositories/trainer.repository.js'
-import { ClubService } from '../services/club.service.js'
-import { ValidationService } from '../services/validation.service.js'
+import clientService from '../services/client.service.js'
 
-export const registerClient = async (req, res) => {
-  const { name, phone, age, isStudent } = req.body;
-
-  // базовая валидация
-  if (!name || !phone || age === undefined) {
-    return res.status(400).json({ error: 'Missing required fields' });
+class ClientController {
+  async create(req, res) {
+    try {
+      const client = await clientService.createClient(req.body)
+      res.status(201).json(client)
+    } catch (error) {
+      res.status(400).json({ message: error.message })
+    }
   }
 
-  if (!ValidationService.validatePhone(phone)) {
-    return res.status(400).json({ error: 'Invalid phone format' });
+  async getAll(req, res) {
+    try {
+      const clients = await clientService.getAllClients()
+      res.json(clients)
+    } catch (error) {
+      res.status(500).json({ message: error.message })
+    }
   }
 
-  if (!ValidationService.validateAge(age)) {
-    return res.status(400).json({ error: 'Invalid age' });
+  async getById(req, res) {
+    try {
+      const client = await clientService.getClientById(req.params.id)
+      res.json(client)
+    } catch (error) {
+      res.status(404).json({ message: error.message })
+    }
   }
 
-  const existing = await clientRepo.findClientByPhone(phone);
-  if (existing) {
-    return res.status(400).json({ error: 'Phone already exists' });
+  async update(req, res) {
+    try {
+      const client = await clientService.updateClient(
+        req.params.id,
+        req.body
+      )
+      res.json(client)
+    } catch (error) {
+      res.status(400).json({ message: error.message })
+    }
   }
 
-  const client = await clientRepo.createClient({
-    name,
-    phone,
-    age,
-    isStudent: Boolean(isStudent)
-  });
-
-  const trainers = await trainerRepo.getActiveTrainers();
-  const trainer = ClubService.findAvailableTrainer(trainers);
-
-  if (trainer) {
-    await trainerRepo.assignTrainer(client.id, trainer.id);
+  async delete(req, res) {
+    try {
+      await clientService.deleteClient(req.params.id)
+      res.status(204).send()
+    } catch (error) {
+      res.status(400).json({ message: error.message })
+    }
   }
+}
 
-  res.json({ message: 'Client registered', client });
-};
+export default new ClientController()

@@ -1,4 +1,4 @@
-const trainerService = require('../services/trainer.service');
+import trainerService from '../services/trainer.service.js';
 
 const createTrainer = async (req, res) => {
   try {
@@ -14,7 +14,7 @@ const getAllTrainers = async (req, res) => {
   res.json(trainers);
 };
 
-module.exports = {
+export default {
   createTrainer,
   getAllTrainers,
 };

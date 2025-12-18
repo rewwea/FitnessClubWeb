@@ -8,45 +8,23 @@ datasource db {
 }
 
 model Trainer {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String
-  specialty String
-  percent   Int     @default(10) // процент зарплаты
-  isActive  Boolean @default(true)
-
-  clients Client[]
+  email     String   @unique
+  phone     String?
+  createdAt DateTime @default(now())
+  clients   Client[]
 }
 
 model Client {
-  id        Int     @id @default(autoincrement())
-  name      String
-  phone     String  @unique
-  age       Int
-  isStudent Boolean @default(false)
+  id       Int     @id @default(autoincrement())
+  fullName String
+  email    String  @unique
+  phone    String  @unique
+  isActive Boolean @default(true)
 
-  trainerId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   trainer   Trainer? @relation(fields: [trainerId], references: [id])
-
-  subscriptions Subscription[]
-}
-
-model SubscriptionPlan {
-  id    Int    @id @default(autoincrement())
-  name  String
-  days  Int
-  price Int
-
-  subscriptions Subscription[]
-}
-
-model Subscription {
-  id        Int      @id @default(autoincrement())
-  startDate DateTime
-  endDate   DateTime
-
-  clientId Int
-  client   Client @relation(fields: [clientId], references: [id])
-
-  planId Int
-  plan   SubscriptionPlan @relation(fields: [planId], references: [id])
+  trainerId Int?
 }
