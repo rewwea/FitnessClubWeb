@@ -1,28 +1,41 @@
-// Подключение к базе данных
-datasource db {
-  provider = "postgresql"
-}
-
-// Генератор Prisma Client
 generator client {
   provider = "prisma-client-js"
 }
 
-// Модели
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
 model Trainer {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   name      String
   specialty String
-  clients   Client[]
+  percent   Int     @default(10) // процент зарплаты
+  isActive  Boolean @default(true)
+
+  clients Client[]
 }
 
 model Client {
-  id            Int            @id @default(autoincrement())
-  name          String
-  phone         String
-  age           Int
-  trainerId     Int?
-  trainer       Trainer?       @relation(fields: [trainerId], references: [id])
+  id        Int     @id @default(autoincrement())
+  name      String
+  phone     String  @unique
+  age       Int
+  isStudent Boolean @default(false)
+
+  trainerId Int?
+  trainer   Trainer? @relation(fields: [trainerId], references: [id])
+
+  subscriptions Subscription[]
+}
+
+model SubscriptionPlan {
+  id    Int    @id @default(autoincrement())
+  name  String
+  days  Int
+  price Int
+
   subscriptions Subscription[]
 }
 
@@ -30,6 +43,10 @@ model Subscription {
   id        Int      @id @default(autoincrement())
   startDate DateTime
   endDate   DateTime
-  clientId  Int
-  client    Client   @relation(fields: [clientId], references: [id])
+
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id])
+
+  planId Int
+  plan   SubscriptionPlan @relation(fields: [planId], references: [id])
 }
