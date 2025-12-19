@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  //url      = env("DATABASE_URL")
 }
 
 model Trainer {
@@ -23,8 +23,33 @@ model Client {
   phone    String  @unique
   isActive Boolean @default(true)
 
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  trainer       Trainer?       @relation(fields: [trainerId], references: [id])
+  trainerId     Int?
+  subscriptions Subscription[]
+  visits        Visit[]
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  type      String
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(true)
+
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id])
+
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  trainer   Trainer? @relation(fields: [trainerId], references: [id])
-  trainerId Int?
+}
+
+model Visit {
+  id        Int      @id @default(autoincrement())
+  visitDate DateTime @default(now())
+
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id])
+
+  createdAt DateTime @default(now())
 }

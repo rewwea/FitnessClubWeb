@@ -1,34 +1,34 @@
-import * as clientRepo from '../repositories/client.repository.js'
-import * as subRepo from '../repositories/subscription.repository.js'
-import * as planRepo from '../repositories/subscriptionPlan.repository.js'
-import { SubscriptionService } from '../services/subscription.service.js'
+import subscriptionService from '../services/subscription.service.js'
 
-export const buySubscription = async (req, res) => {
-  const { clientId, planId } = req.body;
-
-  const client = await clientRepo.findClientById(clientId);
-  if (!client) {
-    return res.status(404).json({ error: 'Client not found' });
+class SubscriptionController {
+  async create(req, res) {
+    try {
+      const subscription = await subscriptionService.create(req.body)
+      res.status(201).json(subscription)
+    } catch (e) {
+      res.status(400).json({ error: e.message })
+    }
   }
 
-  if (SubscriptionService.hasActiveSubscription(client.subscriptions)) {
-    return res.status(400).json({ error: 'Active subscription already exists' });
+  async getAll(req, res) {
+    const subs = await subscriptionService.getAll()
+    res.json(subs)
   }
 
-  const plan = await planRepo.getPlanById(planId);
-  if (!plan) {
-    return res.status(404).json({ error: 'Plan not found' });
+  async getByClient(req, res) {
+    const subs = await subscriptionService.getByClient(
+      Number(req.params.clientId)
+    )
+    res.json(subs)
   }
 
-  const startDate = new Date();
-  const endDate = SubscriptionService.calculateEndDate(startDate, plan.days);
+  async checkAccess(req, res) {
+    const { id } = req.params
+    const { date } = req.query
 
-  const subscription = await subRepo.createSubscription({
-    clientId,
-    planId,
-    startDate,
-    endDate
-  });
+    const access = await subscriptionService.checkAccess(id, date)
+    res.json({ access })
+  }
+}
 
-  res.json({ message: 'Subscription created', subscription });
-};
+export default new SubscriptionController()

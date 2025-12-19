@@ -1,12 +1,28 @@
 import prisma from '../utils/prisma.js'
 
-export const createSubscription = (data) => {
-  return prisma.subscription.create({ data });
-};
+class SubscriptionRepository {
+  create(data) {
+    return prisma.subscription.create({ data })
+  }
 
-export const getClientSubscriptions = (clientId) => {
-  return prisma.subscription.findMany({
-    where: { clientId },
-    include: { plan: true }
-  });
-};
+  findById(id) {
+    return prisma.subscription.findUnique({
+      where: { id },
+      include: { client: true }
+    })
+  }
+
+  findByClient(clientId) {
+    return prisma.subscription.findMany({
+      where: { clientId }
+    })
+  }
+
+  findAll() {
+    return prisma.subscription.findMany({
+      include: { client: true }
+    })
+  }
+}
+
+export default new SubscriptionRepository()
