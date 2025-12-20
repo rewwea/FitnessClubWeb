@@ -1,4 +1,6 @@
 import clientRepository from '../repositories/client.repository.js'
+import subscriptionRepository from '../repositories/subscription.repository.js'
+import trainerRepository from '../repositories/trainer.repository.js'
 
 class ClientService {
   async createClient(data) {
@@ -62,6 +64,47 @@ class ClientService {
 
     return clientRepository.delete(Number(id))
   }
+  async assignTrainer(clientId, trainerId) {
+    const client = await clientRepository.findById(clientId)
+    if (!client) throw new Error('Client not found')
+
+    const trainer = await trainerRepository.findById(trainerId)
+    if (!trainer) throw new Error('Trainer not found')
+
+    return clientRepository.update(clientId, {
+      trainerId
+    })
+  }
+
+async freezeClient(clientId) {
+  const client = await clientRepository.findById(clientId)
+  if (!client) throw new Error('Client not found')
+
+  return clientRepository.update(clientId, {
+    status: 'FROZEN'
+  })
+}
+async unfreezeClient(clientId) {
+  const client = await clientRepository.findById(clientId)
+  if (!client) throw new Error('Client not found')
+
+  return clientRepository.update(clientId, {
+    status: 'ACTIVE'
+  })
+}
+
+async checkAccess(clientId) {
+  const client = await clientRepository.findById(clientId)
+  if (!client) throw new Error('Client not found')
+
+  if (client.status !== 'ACTIVE') return false
+
+  const subscription = await subscriptionRepository.findActiveByClientId(
+    clientId
+  )
+
+  return Boolean(subscription)
+}
 }
 
 export default new ClientService()
