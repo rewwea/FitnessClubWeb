@@ -1,110 +1,81 @@
 import clientRepository from '../repositories/client.repository.js'
-import subscriptionRepository from '../repositories/subscription.repository.js'
-import trainerRepository from '../repositories/trainer.repository.js'
 
-class ClientService {
-  async createClient(data) {
-    const { fullName, email, phone } = data
+/**
+ * Создание клиента
+ */
 
-    // валидация данных
-    if (!fullName || fullName.length < 3) {
-      throw new Error('Full name must be at least 3 characters')
-    }
+const createClient = async (data) => {
+  console.log('[CLIENT SERVICE] createClient input:', data);
 
-    if (!email || !email.includes('@')) {
-      throw new Error('Invalid email')
-    }
+  const {
+    firstName,
+    lastName,
+    email,
+    phone,
+    birthDate
+  } = data;
 
-    if (!phone || phone.length < 10) {
-      throw new Error('Invalid phone number')
-    }
-
-    // проверка на существование клиента с таким email
-    const existingClient = await clientRepository.findByEmail(email)
-    if (existingClient) {
-      throw new Error('Client with this email already exists')
-    }
-
-    return clientRepository.create({
-      fullName,
-      email,
-      phone,
-    })
+  // ===== ВАЛИДАЦИЯ =====
+  if (!firstName || !lastName) {
+    throw new Error('Имя и фамилия обязательны');
   }
 
-  async getAllClients() {
-    return clientRepository.findAll()
+  if (!email) {
+    throw new Error('Email обязателен');
   }
 
-  async getClientById(id) {
-    if (!id || isNaN(id)) {
-      throw new Error('Invalid client id')
-    }
-
-    const client = await clientRepository.findById(Number(id))
-    if (!client) {
-      throw new Error('Client not found')
-    }
-
-    return client
+  if (!phone) {
+    throw new Error('Телефон обязателен');
   }
 
-  async updateClient(id, data) {
-    if (!id || isNaN(id)) {
-      throw new Error('Invalid client id')
-    }
+  // ===== СОЗДАНИЕ =====
+  const client = await clientRepository.create({
+    firstName,
+    lastName,
+    email,
+    phone,
+    birthDate: birthDate ? new Date(birthDate) : null
+  });
 
-    return clientRepository.update(Number(id), data)
+  console.log('[CLIENT SERVICE] created:', client);
+
+  return client;
+};
+
+const getAllClients = async () => {
+  console.log('[CLIENT SERVICE] getAllClients');
+
+  return clientRepository.findAll();
+};
+
+const getClientById = async (id) => {
+  console.log('[CLIENT SERVICE] getClientById:', id);
+
+  const client = await clientRepository.findById(Number(id));
+
+  if (!client) {
+    throw new Error('Клиент не найден');
   }
 
-  async deleteClient(id) {
-    if (!id || isNaN(id)) {
-      throw new Error('Invalid client id')
-    }
+  return client;
+};
 
-    return clientRepository.delete(Number(id))
-  }
-  async assignTrainer(clientId, trainerId) {
-    const client = await clientRepository.findById(clientId)
-    if (!client) throw new Error('Client not found')
+const updateClient = async (id, data) => {
+  console.log('[CLIENT SERVICE] updateClient:', id, data);
 
-    const trainer = await trainerRepository.findById(trainerId)
-    if (!trainer) throw new Error('Trainer not found')
+  return clientRepository.update(Number(id), data);
+};
 
-    return clientRepository.update(clientId, {
-      trainerId
-    })
-  }
+const deleteClient = async (id) => {
+  console.log('[CLIENT SERVICE] deleteClient:', id);
 
-async freezeClient(clientId) {
-  const client = await clientRepository.findById(clientId)
-  if (!client) throw new Error('Client not found')
+  return clientRepository.remove(Number(id));
+};
 
-  return clientRepository.update(clientId, {
-    status: 'FROZEN'
-  })
-}
-async unfreezeClient(clientId) {
-  const client = await clientRepository.findById(clientId)
-  if (!client) throw new Error('Client not found')
-
-  return clientRepository.update(clientId, {
-    status: 'ACTIVE'
-  })
-}
-
-async checkAccess(clientId) {
-  const client = await clientRepository.findById(clientId)
-  if (!client) throw new Error('Client not found')
-
-  if (client.status !== 'ACTIVE') return false
-
-  const subscription = await subscriptionRepository.findActiveByClientId(
-    clientId
-  )
-
-  return Boolean(subscription)
-}
-}
-
-export default new ClientService()
+export default {
+  createClient,
+  getAllClients,
+  getClientById,
+  updateClient,
+  deleteClient
+};

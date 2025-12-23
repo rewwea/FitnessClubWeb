@@ -1,40 +1,48 @@
 import prisma from '../utils/prisma.js'
 
-class ClientRepository {
-  async create(data) {
-    return prisma.client.create({
-      data,
-    })
-  }
+const create = async (data) => {
+  console.log('[CLIENT REPOSITORY] create:', data);
 
-  async findAll() {
-    return prisma.client.findMany()
-  }
+  return prisma.client.create({
+    data
+  });
+};
 
-  async findById(id) {
-    return prisma.client.findUnique({
-      where: { id },
-    })
-  }
+const findAll = async () => {
+  console.log('[CLIENT REPOSITORY] findAll');
 
-  async findByEmail(email) {
-    return prisma.client.findUnique({
-      where: { email },
-    })
-  }
+  return prisma.client.findMany();
+};
 
-  async update(id, data) {
-    return prisma.client.update({
-      where: { id },
-      data,
-    })
-  }
+const findById = async (id) => {
+  console.log('[CLIENT REPOSITORY] findById:', id);
 
-  async delete(id) {
-    return prisma.client.delete({
-      where: { id },
-    })
-  }
-}
+  return prisma.client.findUnique({
+    where: { id }
+  });
+};
 
-export default new ClientRepository()
+const update = async (id, data) => {
+  console.log('[CLIENT REPOSITORY] update:', id, data);
+
+  return prisma.client.update({
+    where: { id },
+    data
+  });
+};
+
+const remove = async (id) => {
+  console.log('[CLIENT REPOSITORY] remove:', id);
+
+  return prisma.client.delete({
+    where: { id }
+  });
+};
+
+export default {
+  create,
+  findAll,
+  findById,
+  update,
+  remove
+};

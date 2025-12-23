@@ -1,4 +1,4 @@
-# **АИС «Фитнес-клуб» 
+# **АИС «Фитнес-клуб»**
 
 ## **1. Общее описание проекта**
 
@@ -88,8 +88,8 @@ HTTP Request -> Route -> Controller -> Service -> Repository -> Prisma -> Databa
 
 |**Метод**|**URL**|**Функция**|**Body / Params**|**Пример**|
 |---|---|---|---|---|
-|GET|/api/trainers|Получить список всех тренеров|—|GET http://localhost:5000/api/trainers|
-|GET|/api/trainers/:id|Получить тренера по ID|id в URL|GET http://localhost:5000/api/trainers/1|
+|GET|/api/trainers|Получить список всех тренеров|—|GET /api/trainers|
+|GET|/api/trainers/:id|Получить тренера по ID|id в URL|GET /api/trainers/1|
 |POST|/api/trainers|Создать тренера|{ name, email, phone }|POST /api/trainers|
 |PUT|/api/trainers/:id|Обновить тренера|{ name?, email?, phone? }|PUT /api/trainers/1|
 |DELETE|/api/trainers/:id|Удалить тренера|id в URL|DELETE /api/trainers/1|
