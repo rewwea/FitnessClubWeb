@@ -1,25 +1,45 @@
 import visitService from '../services/visit.service.js'
 
 class VisitController {
+
   async create(req, res) {
     try {
-      const visit = await visitService.create(Number(req.body.clientId))
+      console.log('[VISIT CONTROLLER] POST /visits')
+
+      const { clientId } = req.body
+      const visit = await visitService.createVisit(clientId)
+
       res.status(201).json(visit)
-    } catch (e) {
-      res.status(400).json({ error: e.message })
+
+    } catch (error) {
+      res.status(400).json({ error: error.message })
     }
   }
 
-  async getAll(req, res) {
-    const visits = await visitService.getAll()
-    res.json(visits)
+  async getByClient(req, res) {
+    try {
+      console.log('[VISIT CONTROLLER] GET /clients/:id/visits')
+
+      const clientId = Number(req.params.id)
+      const visits = await visitService.getClientVisits(clientId)
+
+      res.json(visits)
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
   }
 
-  async getByClient(req, res) {
-    const visits = await visitService.getByClient(
-      Number(req.params.clientId)
-    )
-    res.json(visits)
+  async getCount(req, res) {
+    try {
+      console.log('[VISIT CONTROLLER] GET /clients/:id/visits/count')
+
+      const clientId = Number(req.params.id)
+      const count = await visitService.getClientVisitCount(clientId)
+
+      res.json({ count })
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
   }
 }
 

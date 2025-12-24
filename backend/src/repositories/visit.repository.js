@@ -1,18 +1,28 @@
 import prisma from '../utils/prisma.js'
 
 class VisitRepository {
-  create(data) {
-    return prisma.visit.create({ data })
-  }
 
-  findAll() {
-    return prisma.visit.findMany({
-      include: { client: true }
+  async create(clientId) {
+    console.log('[VISIT REPOSITORY] create visit for client:', clientId)
+
+    return prisma.visit.create({
+      data: { clientId }
     })
   }
 
-  findByClient(clientId) {
+  async findByClient(clientId) {
+    console.log('[VISIT REPOSITORY] findByClient:', clientId)
+
     return prisma.visit.findMany({
+      where: { clientId },
+      orderBy: { visitDate: 'desc' }
+    })
+  }
+
+  async countByClient(clientId) {
+    console.log('[VISIT REPOSITORY] countByClient:', clientId)
+
+    return prisma.visit.count({
       where: { clientId }
     })
   }

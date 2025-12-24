@@ -53,24 +53,46 @@ model SubscriptionType {
 }
 
 model ClientSubscription {
-  id       Int @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
   clientId Int
-  planId   Int
+  typeId   Int
 
   startDate DateTime
   endDate   DateTime
-  isActive  Boolean  @default(true)
 
-  client Client           @relation(fields: [clientId], references: [id])
-  plan   SubscriptionType @relation(fields: [planId], references: [id])
+  price    Int
+  isActive Boolean @default(true)
+
+  frozenFrom DateTime?
+  frozenTo   DateTime?
 
   createdAt DateTime @default(now())
+
+  client              Client               @relation(fields: [clientId], references: [id])
+  type                SubscriptionType     @relation(fields: [typeId], references: [id])
+  subscriptionFreezes SubscriptionFreeze[]
+}
+
+model SubscriptionFreeze {
+  id Int @id @default(autoincrement())
+
+  clientSubscriptionId Int
+  startDate            DateTime
+  endDate              DateTime
+
+  createdAt DateTime @default(now())
+
+  clientSubscription ClientSubscription @relation(fields: [clientSubscriptionId], references: [id])
 }
 
 model Visit {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
   clientId  Int
   visitDate DateTime @default(now())
+
+  createdAt DateTime @default(now())
 
   client Client @relation(fields: [clientId], references: [id])
 }
