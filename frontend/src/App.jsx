@@ -1,7 +1,23 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Layout from './components/Layout'
+import Clients from './pages/Clients'
+import Dashboard from './pages/Dashboard'
+import Stats from './pages/Stats'
+import SubscriptionTypes from './pages/SubscriptionTypes'
+import Visits from './pages/Visits'
+
 export default function App() {
 	return (
-		<div className='min-h-screen bg-gray-900 text-white flex items-center justify-center'>
-			<h1 className='text-4xl font-bold text-blue-400'>Tailwind работает 🚀</h1>
-		</div>
+		<BrowserRouter>
+			<Routes>
+				<Route element={<Layout />}>
+					<Route index element={<Dashboard />} />
+					<Route path='clients' element={<Clients />} />
+					<Route path='subscription-types' element={<SubscriptionTypes />} />
+					<Route path='visits' element={<Visits />} />
+					<Route path='stats' element={<Stats />} />
+				</Route>
+			</Routes>
+		</BrowserRouter>
 	)
 }
