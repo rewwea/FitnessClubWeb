@@ -19,6 +19,9 @@ model Client {
 
   isActive Boolean @default(true)
 
+  trainerId Int?
+  trainer   Trainer? @relation(fields: [trainerId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -27,9 +30,11 @@ model Client {
 }
 
 model Trainer {
-  id        Int     @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
   firstName String
   lastName  String
+
   email     String  @unique
   phone     String?
   specialty String
@@ -38,17 +43,22 @@ model Trainer {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  clients Client[]
+  visits  Visit[]
 }
 
 model SubscriptionType {
-  id           Int    @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
   name         String
   durationDays Int
   price        Int
 
   isActive Boolean @default(true)
 
-  createdAt           DateTime             @default(now())
+  createdAt DateTime @default(now())
+
   clientSubscriptions ClientSubscription[]
 }
 
@@ -64,13 +74,11 @@ model ClientSubscription {
   price    Int
   isActive Boolean @default(true)
 
-  frozenFrom DateTime?
-  frozenTo   DateTime?
-
   createdAt DateTime @default(now())
 
-  client              Client               @relation(fields: [clientId], references: [id])
-  type                SubscriptionType     @relation(fields: [typeId], references: [id])
+  client Client           @relation(fields: [clientId], references: [id])
+  type   SubscriptionType @relation(fields: [typeId], references: [id])
+
   subscriptionFreezes SubscriptionFreeze[]
 }
 
@@ -89,10 +97,13 @@ model SubscriptionFreeze {
 model Visit {
   id Int @id @default(autoincrement())
 
-  clientId  Int
-  visitDate DateTime @default(now())
+  clientId Int
 
+  trainerId Int?
+
+  visitDate DateTime @default(now())
   createdAt DateTime @default(now())
 
-  client Client @relation(fields: [clientId], references: [id])
+  client  Client   @relation(fields: [clientId], references: [id])
+  trainer Trainer? @relation(fields: [trainerId], references: [id])
 }

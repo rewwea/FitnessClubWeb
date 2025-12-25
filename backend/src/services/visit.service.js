@@ -4,27 +4,20 @@ import subscriptionFreezeRepository from '../repositories/subscriptionFreeze.rep
 import visitRepository from '../repositories/visit.repository.js'
 
 class VisitService {
-	async createVisit(clientId) {
-		console.log('[VISIT SERVICE] createVisit:', clientId)
+	async createVisit(clientId, trainerId = null) {
+		console.log('[VISIT SERVICE] createVisit:', { clientId, trainerId })
 
 		if (!clientId) {
 			throw new Error('clientId обязателен')
 		}
 
-		const activeFreeze = await subscriptionFreezeRepository.findActiveFreeze(
-			activeSubscription.id
-		)
-		if (activeFreeze) {
-			throw new Error('Подписка заморожена')
-		}
-
-		const client = await clientRepository.findById(clientId)
+		const client = await clientRepository.findById(Number(clientId))
 		if (!client || !client.isActive) {
 			throw new Error('Клиент не найден или неактивен')
 		}
 
 		const activeSubscription =
-			await clientSubscriptionRepository.findActiveByClient(clientId)
+			await clientSubscriptionRepository.findActiveByClient(Number(clientId))
 
 		if (!activeSubscription) {
 			throw new Error('У клиента нет активной подписки')
@@ -35,7 +28,17 @@ class VisitService {
 			throw new Error('Подписка клиента истекла')
 		}
 
-		return visitRepository.create(clientId)
+		const activeFreeze = await subscriptionFreezeRepository.findActiveFreeze(
+			activeSubscription.id
+		)
+		if (activeFreeze) {
+			throw new Error('Подписка заморожена')
+		}
+
+		return visitRepository.create(
+			Number(clientId),
+			trainerId ? Number(trainerId) : null
+		)
 	}
 
 	async getClientVisits(clientId) {
