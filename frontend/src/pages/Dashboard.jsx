@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import Button from '../components/Button'
+import Card from '../components/Card'
 import axios from '../utils/axios'
 
 export default function Dashboard() {
@@ -21,33 +23,32 @@ export default function Dashboard() {
 	}, [])
 
 	return (
-		<div>
-			<h1 className='text-2xl font-bold mb-4'>Dashboard</h1>
-
-			<div className='grid grid-cols-3 gap-4 mb-6'>
-				<div className='p-4 bg-gradient-to-br from-gray-800 to-gray-700 rounded'>
-					<div className='text-sm text-gray-300'>Total clients</div>
-					<div className='text-2xl font-semibold'>{stats.totalClients}</div>
-				</div>
-
-				<div className='p-4 bg-gradient-to-br from-gray-800 to-gray-700 rounded'>
-					<div className='text-sm text-gray-300'>Active subscriptions</div>
-					<div className='text-2xl font-semibold'>
-						{stats.activeSubscriptions}
-					</div>
-				</div>
-
-				<div className='p-4 bg-gradient-to-br from-gray-800 to-gray-700 rounded'>
-					<div className='text-sm text-gray-300'>Total visits</div>
-					<div className='text-2xl font-semibold'>{stats.totalVisits}</div>
+		<div className='space-y-6'>
+			<div className='flex items-center justify-between'>
+				<h1 className='text-3xl font-bold'>Dashboard</h1>
+				<div className='flex gap-3'>
+					<Button>Create client</Button>
+					<Button className='bg-green-500'>Register visit</Button>
 				</div>
 			</div>
 
-			<div className='flex gap-3'>
-				<button className='px-4 py-2 bg-blue-600 rounded'>Create client</button>
-				<button className='px-4 py-2 bg-green-600 rounded'>
-					Register visit
-				</button>
+			<div className='grid grid-cols-3 gap-4 mb-6'>
+				<Card>
+					<div className='text-sm muted'>Total clients</div>
+					<div className='text-3xl font-semibold'>{stats.totalClients}</div>
+				</Card>
+
+				<Card>
+					<div className='text-sm muted'>Active subscriptions</div>
+					<div className='text-3xl font-semibold'>
+						{stats.activeSubscriptions}
+					</div>
+				</Card>
+
+				<Card>
+					<div className='text-sm muted'>Total visits</div>
+					<div className='text-3xl font-semibold'>{stats.totalVisits}</div>
+				</Card>
 			</div>
 		</div>
 	)

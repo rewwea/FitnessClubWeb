@@ -2,6 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import Button from '../components/Button'
+import Card from '../components/Card'
 import Modal from '../components/Modal'
 import axios from '../utils/axios'
 
@@ -128,25 +130,23 @@ export default function Clients() {
 	}
 
 	return (
-		<div>
-			<div className='flex items-center justify-between mb-4'>
+		<div className='space-y-6'>
+			<div className='flex items-center justify-between mb-2'>
 				<h1 className='text-2xl font-bold'>Clients</h1>
-				<button
-					onClick={() => setOpenCreate(true)}
-					className='px-3 py-2 bg-blue-600 rounded'
-				>
-					Create client
-				</button>
+				<div>
+					<Button onClick={() => setOpenCreate(true)}>Create client</Button>
+				</div>
 			</div>
 
-			<div className='bg-gray-800 rounded overflow-hidden'>
+			<Card className='overflow-auto'>
 				<table className='min-w-full'>
 					<thead className='bg-gray-700'>
 						<tr>
-							<th className='p-2 text-left'>ID</th>
-							<th className='p-2 text-left'>Name</th>
-							<th className='p-2 text-left'>Email</th>
-							<th className='p-2 text-left'>Phone</th>
+							<th className='p-3 text-left'>ID</th>
+							<th className='p-3 text-left'>Name</th>
+							<th className='p-3 text-left'>Email</th>
+							<th className='p-3 text-left'>Phone</th>
+							<th className='p-3 text-left'>Trainer</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -156,17 +156,18 @@ export default function Clients() {
 								className='border-t border-gray-700 hover:bg-gray-800 cursor-pointer'
 								onClick={() => openDetails(c)}
 							>
-								<td className='p-2'>{c.id}</td>
-								<td className='p-2'>
+								<td className='p-3'>{c.id}</td>
+								<td className='p-3'>
 									{c.firstName} {c.lastName}
 								</td>
-								<td className='p-2'>{c.email}</td>
-								<td className='p-2'>{c.phone}</td>
+								<td className='p-3'>{c.email}</td>
+								<td className='p-3'>{c.phone}</td>
+								<td className='p-3'>{c.trainerId ? 'Assigned' : '—'}</td>
 							</tr>
 						))}
 					</tbody>
 				</table>
-			</div>
+			</Card>
 
 			{openCreate && (
 				<Modal title='Create client' onClose={() => setOpenCreate(false)}>
