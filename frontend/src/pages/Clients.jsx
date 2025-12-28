@@ -20,10 +20,14 @@ export default function Clients() {
 	const [openCreate, setOpenCreate] = useState(false)
 
 	const createSchema = z.object({
-		firstName: z.string().min(1, 'Required'),
-		lastName: z.string().min(1, 'Required'),
-		email: z.string().email('Invalid email'),
-		phone: z.string().optional(),
+		firstName: z.string().min(1, 'Обязательное поле'),
+		lastName: z.string().min(1, 'Обязательное поле'),
+		email: z.string().email('Неверный email'),
+		phone: z
+			.string()
+			.min(1, 'Номер телефона обязателен')
+			.regex(/^[\d\s()+-]{6,20}$/, 'Неверный формат телефона'),
+		birthDate: z.string().min(1, 'Дата рождения обязательна'),
 		trainerId: z.string().optional(),
 	})
 
@@ -39,6 +43,7 @@ export default function Clients() {
 			lastName: '',
 			email: '',
 			phone: '',
+			birthDate: '',
 			trainerId: '',
 		},
 	})
@@ -79,12 +84,22 @@ export default function Clients() {
 			reset()
 			load()
 		} catch (e) {
-			alert(e?.response?.data?.error || e.message || 'Error')
+			alert(e?.response?.data?.error || e.message || 'Ошибка')
+		}
+	}
+
+	const deleteClient = async id => {
+		try {
+			await axios.delete(`/clients/${id}`)
+			load()
+		} catch (e) {
+			alert(e?.response?.data?.error || e.message || 'Ошибка')
 		}
 	}
 
 	const openDetails = async client => {
 		setSelectedClient(client)
+		setModalTrainerId(client.trainerId ? String(client.trainerId) : '')
 		try {
 			const r = await axios.get(`/client-subscriptions/client/${client.id}`)
 			setClientSubs(r.data)
@@ -93,8 +108,27 @@ export default function Clients() {
 		}
 	}
 
+	const [modalTrainerId, setModalTrainerId] = useState('')
+
+	const assignTrainerToClient = async (clientId, trainerId) => {
+		try {
+			await axios.put(`/clients/${clientId}`, {
+				trainerId: trainerId === '' ? null : Number(trainerId),
+			})
+			load()
+			// update selected client locally
+			setSelectedClient(prev => ({
+				...prev,
+				trainerId: trainerId === '' ? null : Number(trainerId),
+			}))
+			alert('Тренер назначен')
+		} catch (e) {
+			alert(e?.response?.data?.error || e.message || 'Ошибка')
+		}
+	}
+
 	const assignSubscription = async () => {
-		if (!assignTypeId) return alert('Choose type')
+		if (!assignTypeId) return alert('Выберите тип')
 		try {
 			await axios.post('/client-subscriptions', {
 				clientId: selectedClient.id,
@@ -106,13 +140,13 @@ export default function Clients() {
 			)
 			setClientSubs(r.data)
 		} catch (e) {
-			alert(e?.response?.data?.error || 'Error')
+			alert(e?.response?.data?.error || 'Ошибка')
 		}
 	}
 
 	const freezeSubscription = async subId => {
 		if (!freezeForm.startDate || !freezeForm.endDate)
-			return alert('Dates required')
+			return alert('Требуются даты')
 		try {
 			await axios.post('/subscription-freeze', {
 				clientSubscriptionId: subId,
@@ -125,16 +159,16 @@ export default function Clients() {
 			)
 			setClientSubs(r.data)
 		} catch (e) {
-			alert(e?.response?.data?.error || 'Error')
+			alert(e?.response?.data?.error || 'Ошибка')
 		}
 	}
 
 	return (
 		<div className='space-y-6'>
 			<div className='flex items-center justify-between mb-2'>
-				<h1 className='text-2xl font-bold'>Clients</h1>
+				<h1 className='text-2xl font-bold'>Клиенты</h1>
 				<div>
-					<Button onClick={() => setOpenCreate(true)}>Create client</Button>
+					<Button onClick={() => setOpenCreate(true)}>Создать клиента</Button>
 				</div>
 			</div>
 
@@ -143,10 +177,11 @@ export default function Clients() {
 					<thead className='bg-gray-700'>
 						<tr>
 							<th className='p-3 text-left'>ID</th>
-							<th className='p-3 text-left'>Name</th>
+							<th className='p-3 text-left'>Имя</th>
 							<th className='p-3 text-left'>Email</th>
-							<th className='p-3 text-left'>Phone</th>
-							<th className='p-3 text-left'>Trainer</th>
+							<th className='p-3 text-left'>Телефон</th>
+							<th className='p-3 text-left'>Тренер</th>
+							<th className='p-3 text-left'>Действия</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -162,7 +197,18 @@ export default function Clients() {
 								</td>
 								<td className='p-3'>{c.email}</td>
 								<td className='p-3'>{c.phone}</td>
-								<td className='p-3'>{c.trainerId ? 'Assigned' : '—'}</td>
+								<td className='p-3'>{c.trainerId ? 'Назначен' : '—'}</td>
+								<td className='p-3'>
+									<button
+										className='px-2 py-1 bg-red-600 rounded text-sm'
+										onClick={e => {
+											e.stopPropagation()
+											if (confirm('Удалить клиента?')) deleteClient(c.id)
+										}}
+									>
+										Удалить
+									</button>
+								</td>
 							</tr>
 						))}
 					</tbody>
@@ -170,12 +216,12 @@ export default function Clients() {
 			</Card>
 
 			{openCreate && (
-				<Modal title='Create client' onClose={() => setOpenCreate(false)}>
+				<Modal title='Создать клиента' onClose={() => setOpenCreate(false)}>
 					<form onSubmit={handleSubmit(create)} className='space-y-2'>
 						<div>
 							<input
 								{...register('firstName')}
-								placeholder='First name'
+								placeholder='Имя'
 								className='w-full p-2 border rounded'
 							/>
 							{errors.firstName && (
@@ -187,7 +233,7 @@ export default function Clients() {
 						<div>
 							<input
 								{...register('lastName')}
-								placeholder='Last name'
+								placeholder='Фамилия'
 								className='w-full p-2 border rounded'
 							/>
 							{errors.lastName && (
@@ -209,9 +255,22 @@ export default function Clients() {
 							)}
 						</div>
 						<div>
+							<label className='text-sm muted block mb-1'>Дата рождения</label>
+							<input
+								type='date'
+								{...register('birthDate')}
+								className='w-full p-2 border rounded'
+							/>
+							{errors.birthDate && (
+								<div className='text-sm text-red-500'>
+									{errors.birthDate.message}
+								</div>
+							)}
+						</div>
+						<div>
 							<input
 								{...register('phone')}
-								placeholder='Phone'
+								placeholder='Телефон'
 								className='w-full p-2 border rounded'
 							/>
 						</div>
@@ -220,7 +279,7 @@ export default function Clients() {
 								{...register('trainerId')}
 								className='w-full p-2 border rounded'
 							>
-								<option value=''>No trainer</option>
+								<option value=''>Без тренера</option>
 								{trainers.map(t => (
 									<option key={t.id} value={t.id}>
 										{t.firstName} {t.lastName}
@@ -234,10 +293,10 @@ export default function Clients() {
 								type='button'
 								className='px-3 py-2'
 							>
-								Cancel
+								Отмена
 							</button>
 							<button type='submit' className='px-3 py-2 bg-blue-600 rounded'>
-								Create
+								Создать
 							</button>
 						</div>
 					</form>
@@ -246,24 +305,28 @@ export default function Clients() {
 
 			{selectedClient && (
 				<Modal
-					title={`Client: ${selectedClient.firstName} ${selectedClient.lastName}`}
+					title={`Клиент: ${selectedClient.firstName} ${selectedClient.lastName}`}
 					onClose={() => setSelectedClient(null)}
 				>
 					<div className='space-y-3'>
 						<div>ID: {selectedClient.id}</div>
 						<div>Email: {selectedClient.email}</div>
-						<div>Phone: {selectedClient.phone}</div>
+						<div>Телефон: {selectedClient.phone}</div>
 
 						<div>
-							<h4 className='font-semibold mt-2'>Subscriptions</h4>
+							<h4 className='font-semibold mt-2'>Абонементы</h4>
 							{clientSubs.length === 0 && (
-								<div className='text-sm text-gray-400'>No subscriptions</div>
+								<div className='text-sm text-gray-400'>Нет абонементов</div>
 							)}
 							{clientSubs.map(s => (
 								<div key={s.id} className='p-2 bg-gray-800 rounded my-2'>
-									<div>Type: {s.type.name}</div>
-									<div>Start: {new Date(s.startDate).toLocaleDateString()}</div>
-									<div>End: {new Date(s.endDate).toLocaleDateString()}</div>
+									<div>Тип: {s.type.name}</div>
+									<div>
+										Начало: {new Date(s.startDate).toLocaleDateString()}
+									</div>
+									<div>
+										Окончание: {new Date(s.endDate).toLocaleDateString()}
+									</div>
 									<div className='mt-2 flex gap-2'>
 										<button
 											onClick={() => {
@@ -272,13 +335,13 @@ export default function Clients() {
 											}}
 											className='px-2 py-1 bg-blue-600 rounded text-sm'
 										>
-											Assign new
+											Назначить новый
 										</button>
 										<button
 											onClick={() => setFreezeOpenFor(s.id)}
 											className='px-2 py-1 bg-yellow-600 rounded text-sm'
 										>
-											Freeze
+											Заморозить
 										</button>
 									</div>
 									{freezeOpenFor === s.id && (
@@ -309,7 +372,7 @@ export default function Clients() {
 												onClick={() => freezeSubscription(s.id)}
 												className='px-2 py-1 bg-green-600 rounded text-sm'
 											>
-												Apply
+												Применить
 											</button>
 										</div>
 									)}
@@ -317,12 +380,36 @@ export default function Clients() {
 							))}
 						</div>
 
-						<div className='flex justify-end'>
+						<div>
+							<label className='block text-sm muted mb-2'>Тренер</label>
+							<select
+								value={modalTrainerId}
+								onChange={e => setModalTrainerId(e.target.value)}
+								className='w-full p-2 border rounded bg-transparent'
+							>
+								<option value=''>Без тренера</option>
+								{trainers.map(t => (
+									<option key={t.id} value={t.id}>
+										{t.firstName} {t.lastName}
+									</option>
+								))}
+							</select>
+						</div>
+
+						<div className='flex justify-end gap-2 mt-3'>
 							<button
 								onClick={() => setSelectedClient(null)}
 								className='px-3 py-2'
 							>
-								Close
+								Закрыть
+							</button>
+							<button
+								className='px-3 py-2 bg-blue-600 rounded text-white'
+								onClick={() =>
+									assignTrainerToClient(selectedClient.id, modalTrainerId)
+								}
+							>
+								Сохранить
 							</button>
 						</div>
 					</div>
@@ -330,17 +417,17 @@ export default function Clients() {
 			)}
 
 			{assignOpen && selectedClient && (
-				<Modal title='Assign subscription' onClose={() => setAssignOpen(false)}>
+				<Modal title='Назначить абонемент' onClose={() => setAssignOpen(false)}>
 					<div className='space-y-2'>
 						<select
 							value={assignTypeId}
 							onChange={e => setAssignTypeId(e.target.value)}
 							className='w-full p-2 border rounded'
 						>
-							<option value=''>Select type</option>
+							<option value=''>Выберите тип</option>
 							{types.map(t => (
 								<option key={t.id} value={t.id}>
-									{t.name} — {t.durationDays}d — {t.price}
+									{t.name} — {t.durationDays}д — {t.price} ₽
 								</option>
 							))}
 						</select>
@@ -349,13 +436,13 @@ export default function Clients() {
 								onClick={() => setAssignOpen(false)}
 								className='px-3 py-2'
 							>
-								Cancel
+								Отмена
 							</button>
 							<button
 								onClick={assignSubscription}
 								className='px-3 py-2 bg-blue-600 rounded'
 							>
-								Assign
+								Назначить
 							</button>
 						</div>
 					</div>

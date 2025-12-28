@@ -2,40 +2,57 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 
 const MenuItem = ({ to, children }) => {
 	const loc = useLocation()
-	const active = loc.pathname === to
+	const path = loc.pathname
+	const active = to === '/' ? path === '/' : path.startsWith(to)
+	const label = typeof children === 'string' ? children : ''
+	const initial = label ? label.trim().charAt(0).toUpperCase() : '•'
+
 	return (
 		<Link
 			to={to}
-			className={`block px-4 py-2 rounded ${
-				active ? 'bg-blue-600' : 'hover:bg-gray-800'
-			}`}
+			className={`nav-item ${active ? 'nav-item-active' : 'nav-item-inactive'}`}
 		>
-			{children}
+			<div className='nav-badge' aria-hidden>
+				{initial}
+			</div>
+			<div className='nav-label'>{children}</div>
 		</Link>
 	)
 }
 
 export default function Layout() {
 	return (
-		<div className='min-h-screen bg-gray-900 text-white flex'>
-			<aside className='w-64 bg-gray-800 p-4'>
-				<h2 className='text-xl font-bold mb-4'>Fitness Admin</h2>
-				<nav className='space-y-2'>
-					<MenuItem to='/'>Dashboard</MenuItem>
-					<MenuItem to='/clients'>Clients</MenuItem>
-					<MenuItem to='/subscription-types'>Subscription Types</MenuItem>
-					<MenuItem to='/visits'>Visits</MenuItem>
-					<MenuItem to='/stats'>Statistics</MenuItem>
+		<div className='min-h-screen flex'>
+			<aside className='w-72 p-6 sidebar'>
+				<div className='logo mb-6'>
+					<div className='dot' />
+					<div>
+						<div style={{ fontSize: 18 }}>Fitness</div>
+						<div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
+							Admin
+						</div>
+					</div>
+				</div>
+
+				<nav className='space-y-3'>
+					<MenuItem to='/'>Панель</MenuItem>
+					<MenuItem to='/clients'>Клиенты</MenuItem>
+					<MenuItem to='/assign-subscription'>Назначить абонемент</MenuItem>
+					<MenuItem to='/subscription-types'>Типы абонементов</MenuItem>
+					<MenuItem to='/visits'>Посещения</MenuItem>
+					<MenuItem to='/stats'>Статистика</MenuItem>
 				</nav>
 			</aside>
 
-			<div className='flex-1 flex flex-col'>
-				<header className='h-16 flex items-center justify-between px-6 bg-gradient-to-b from-transparent to-gray-900 border-b border-gray-800'>
-					<div className='text-sm text-gray-300'>Welcome, Manager</div>
+			<div className='flex-1 flex flex-col bg-transparent'>
+				<header className='h-16 flex items-center justify-between px-8 border-b border-white/3'>
+					<div className='text-sm text-gray-300'>
+						Добро пожаловать, Менеджер
+					</div>
 					<div className='text-sm text-gray-400'>admin@fitness.local</div>
 				</header>
 
-				<main className='flex-1 p-6'>
+				<main className='flex-1 p-8 container'>
 					<Outlet />
 				</main>
 			</div>

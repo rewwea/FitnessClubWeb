@@ -2,6 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import Button from '../components/Button'
+import Card from '../components/Card'
 import Modal from '../components/Modal'
 import axios from '../utils/axios'
 
@@ -49,38 +51,46 @@ export default function SubscriptionTypes() {
 	}
 
 	return (
-		<div>
+		<div className='space-y-4'>
 			<div className='flex items-center justify-between mb-4'>
-				<h1 className='text-2xl font-bold'>Subscription Types</h1>
-				<button
-					onClick={() => setOpen(true)}
-					className='px-3 py-2 bg-blue-600 rounded'
-				>
-					Create
-				</button>
+				<div>
+					<h1 className='text-2xl font-bold'>Типы абонементов</h1>
+					<div className='text-sm muted'>Управление типами абонементов</div>
+				</div>
+				<Button onClick={() => setOpen(true)}>Создать тип</Button>
 			</div>
 
-			<div className='bg-gray-800 rounded p-2'>
-				{types.map(t => (
-					<div
-						key={t.id}
-						className='p-2 border-b border-gray-700 flex justify-between'
-					>
-						<div>
-							{t.name} — {t.durationDays} days — {t.price}
-						</div>
-					</div>
-				))}
-			</div>
+			<Card>
+				<div className='overflow-auto'>
+					<table className='modern-table'>
+						<thead>
+							<tr>
+								<th>Название</th>
+								<th>Длительность</th>
+								<th>Цена</th>
+							</tr>
+						</thead>
+						<tbody>
+							{types.map(t => (
+								<tr key={t.id}>
+									<td>{t.name}</td>
+									<td>{t.durationDays} д</td>
+									<td>{t.price} ₽</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			</Card>
 
 			{open && (
-				<Modal title='Create subscription type' onClose={() => setOpen(false)}>
-					<form onSubmit={handleSubmit(create)} className='space-y-2'>
+				<Modal title='Создать тип абонемента' onClose={() => setOpen(false)}>
+					<form onSubmit={handleSubmit(create)} className='space-y-3'>
 						<div>
 							<input
 								{...register('name')}
-								placeholder='Name'
-								className='w-full p-2 border rounded'
+								placeholder='Название'
+								className='w-full p-2 border rounded bg-transparent'
 							/>
 							{errors.name && (
 								<div className='text-sm text-red-500'>
@@ -92,8 +102,8 @@ export default function SubscriptionTypes() {
 							<input
 								type='number'
 								{...register('durationDays', { valueAsNumber: true })}
-								placeholder='Duration days'
-								className='w-full p-2 border rounded'
+								placeholder='Дней'
+								className='w-full p-2 border rounded bg-transparent'
 							/>
 							{errors.durationDays && (
 								<div className='text-sm text-red-500'>
@@ -105,8 +115,8 @@ export default function SubscriptionTypes() {
 							<input
 								type='number'
 								{...register('price', { valueAsNumber: true })}
-								placeholder='Price'
-								className='w-full p-2 border rounded'
+								placeholder='Цена в ₽'
+								className='w-full p-2 border rounded bg-transparent'
 							/>
 							{errors.price && (
 								<div className='text-sm text-red-500'>
@@ -120,11 +130,9 @@ export default function SubscriptionTypes() {
 								type='button'
 								className='px-3 py-2'
 							>
-								Cancel
+								Отмена
 							</button>
-							<button type='submit' className='px-3 py-2 bg-blue-600 rounded'>
-								Create
-							</button>
+							<Button type='submit'>Создать</Button>
 						</div>
 					</form>
 				</Modal>

@@ -25,29 +25,35 @@ export default function Dashboard() {
 	return (
 		<div className='space-y-6'>
 			<div className='flex items-center justify-between'>
-				<h1 className='text-3xl font-bold'>Dashboard</h1>
+				<div>
+					<h1 className='text-3xl font-bold'>Панель управления</h1>
+					<div className='text-sm muted'>Общая статистика клуба</div>
+				</div>
+
 				<div className='flex gap-3'>
-					<Button>Create client</Button>
-					<Button className='bg-green-500'>Register visit</Button>
+					<Button>Создать клиента</Button>
+					<Button className='bg-green-500'>Зарегистрировать посещение</Button>
 				</div>
 			</div>
 
-			<div className='grid grid-cols-3 gap-4 mb-6'>
-				<Card>
-					<div className='text-sm muted'>Total clients</div>
-					<div className='text-3xl font-semibold'>{stats.totalClients}</div>
+			<div className='grid grid-cols-3 gap-6 mb-6'>
+				<Card className='p-6'>
+					<div className='text-sm muted'>Клиентов всего</div>
+					<div className='text-3xl font-semibold mt-2'>
+						{stats.totalClients}
+					</div>
 				</Card>
 
-				<Card>
-					<div className='text-sm muted'>Active subscriptions</div>
-					<div className='text-3xl font-semibold'>
+				<Card className='p-6'>
+					<div className='text-sm muted'>Активных абонементов</div>
+					<div className='text-3xl font-semibold mt-2'>
 						{stats.activeSubscriptions}
 					</div>
 				</Card>
 
-				<Card>
-					<div className='text-sm muted'>Total visits</div>
-					<div className='text-3xl font-semibold'>{stats.totalVisits}</div>
+				<Card className='p-6'>
+					<div className='text-sm muted'>Посещений</div>
+					<div className='text-3xl font-semibold mt-2'>{stats.totalVisits}</div>
 				</Card>
 			</div>
 		</div>

@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
+import AssignSubscription from './pages/AssignSubscription'
 import Clients from './pages/Clients'
 import Dashboard from './pages/Dashboard'
 import Stats from './pages/Stats'
@@ -13,6 +14,7 @@ export default function App() {
 				<Route element={<Layout />}>
 					<Route index element={<Dashboard />} />
 					<Route path='clients' element={<Clients />} />
+					<Route path='assign-subscription' element={<AssignSubscription />} />
 					<Route path='subscription-types' element={<SubscriptionTypes />} />
 					<Route path='visits' element={<Visits />} />
 					<Route path='stats' element={<Stats />} />

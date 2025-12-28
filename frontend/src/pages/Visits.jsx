@@ -2,6 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import Button from '../components/Button'
+import Card from '../components/Card'
 import Modal from '../components/Modal'
 import axios from '../utils/axios'
 
@@ -70,26 +72,26 @@ export default function Visits() {
 	}
 
 	return (
-		<div>
+		<div className='space-y-4'>
 			<div className='flex items-center justify-between mb-4'>
-				<h1 className='text-2xl font-bold'>Visits</h1>
-				<button
-					onClick={() => setOpen(true)}
-					className='px-3 py-2 bg-blue-600 rounded'
-				>
-					Register visit
-				</button>
+				<div>
+					<h1 className='text-2xl font-bold'>Посещения</h1>
+					<div className='text-sm muted'>Регистрация и история посещений</div>
+				</div>
+				<Button onClick={() => setOpen(true)}>
+					Зарегистрировать посещение
+				</Button>
 			</div>
 
-			<div className='mb-4'>
+			<div>
 				<label className='block text-sm text-gray-400 mb-2'>
-					Select client to view visits
+					Выберите клиента
 				</label>
 				<select
 					onChange={e => loadVisitsForClient(e.target.value)}
-					className='p-2 bg-gray-800 rounded w-64'
+					className='p-2 bg-gray-900 rounded w-64'
 				>
-					<option value=''>-- choose client --</option>
+					<option value=''>-- выбрать клиента --</option>
 					{clients.map(c => (
 						<option key={c.id} value={c.id}>
 							{c.firstName} {c.lastName}
@@ -99,27 +101,30 @@ export default function Visits() {
 			</div>
 
 			{selectedClientVisits.length > 0 && (
-				<div className='bg-gray-800 rounded p-3 mb-4'>
-					<h3 className='font-semibold mb-2'>Visits</h3>
-					<ul className='space-y-1'>
+				<Card>
+					<h3 className='font-semibold mb-2'>История посещений</h3>
+					<ul className='space-y-2'>
 						{selectedClientVisits.map(v => (
 							<li key={v.id} className='text-sm text-gray-300'>
-								{new Date(v.visitDate).toLocaleString()} — trainer:{' '}
+								{new Date(v.visitDate).toLocaleString()} — тренер:{' '}
 								{v.trainerId ?? '—'}
 							</li>
 						))}
 					</ul>
-				</div>
+				</Card>
 			)}
 
 			{open && (
-				<Modal title='Register visit' onClose={() => setOpen(false)}>
-					<form onSubmit={handleSubmit(create)} className='space-y-2'>
+				<Modal
+					title='Зарегистрировать посещение'
+					onClose={() => setOpen(false)}
+				>
+					<form onSubmit={handleSubmit(create)} className='space-y-3'>
 						<select
 							{...register('clientId')}
-							className='w-full p-2 border rounded'
+							className='w-full p-2 border rounded bg-transparent'
 						>
-							<option value=''>Select client</option>
+							<option value=''>Выберите клиента</option>
 							{clients.map(c => (
 								<option key={c.id} value={c.id}>
 									{c.firstName} {c.lastName}
@@ -134,9 +139,9 @@ export default function Visits() {
 
 						<select
 							{...register('trainerId')}
-							className='w-full p-2 border rounded'
+							className='w-full p-2 border rounded bg-transparent'
 						>
-							<option value=''>No trainer</option>
+							<option value=''>Без тренера</option>
 							{trainers.map(t => (
 								<option key={t.id} value={t.id}>
 									{t.firstName} {t.lastName}
@@ -150,11 +155,9 @@ export default function Visits() {
 								type='button'
 								className='px-3 py-2'
 							>
-								Cancel
+								Отмена
 							</button>
-							<button type='submit' className='px-3 py-2 bg-blue-600 rounded'>
-								Create
-							</button>
+							<Button type='submit'>Создать</Button>
 						</div>
 					</form>
 				</Modal>
