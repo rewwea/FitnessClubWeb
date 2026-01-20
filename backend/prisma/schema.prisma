@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  //url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model Client {
@@ -106,4 +106,20 @@ model Visit {
 
   client  Client   @relation(fields: [clientId], references: [id])
   trainer Trainer? @relation(fields: [trainerId], references: [id])
+}
+
+model Admin {
+  id Int @id @default(autoincrement())
+
+  firstName String
+  lastName  String
+
+  email    String @unique
+  password String
+
+  role     String  @default("manager")
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

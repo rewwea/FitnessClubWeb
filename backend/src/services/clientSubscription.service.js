@@ -23,9 +23,8 @@ class ClientSubscriptionService {
 			throw new Error('Тип подписки не найден или неактивен')
 		}
 
-		const activeSub = await clientSubscriptionRepository.findActiveByClient(
-			clientId
-		)
+		const activeSub =
+			await clientSubscriptionRepository.findActiveByClient(clientId)
 		if (activeSub) {
 			throw new Error('У клиента уже есть активная подписка')
 		}
@@ -49,6 +48,12 @@ class ClientSubscriptionService {
 		return clientSubscriptionRepository.findByClient(clientId)
 	}
 
+	async getAllSubscriptions() {
+		console.log('[CLIENT SUB SERVICE] getAllSubscriptions')
+
+		return clientSubscriptionRepository.findAll()
+	}
+
 	async expireSubscriptions() {
 		console.log('[CLIENT SUB SERVICE] expireSubscriptions started')
 
@@ -61,7 +66,7 @@ class ClientSubscriptionService {
 
 		console.log(
 			'[CLIENT SUB SERVICE] expireSubscriptions finished:',
-			expiredSubs.length
+			expiredSubs.length,
 		)
 	}
 }

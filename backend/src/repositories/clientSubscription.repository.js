@@ -30,6 +30,18 @@ class ClientSubscriptionRepository {
 		})
 	}
 
+	async findAll() {
+		console.log('[CLIENT SUB REPO] findAll')
+
+		return prisma.clientSubscription.findMany({
+			include: {
+				client: true,
+				type: true,
+			},
+			orderBy: { startDate: 'desc' },
+		})
+	}
+
 	async findById(id) {
 		console.log('[CLIENT SUB REPO] findById:', id)
 

@@ -3,6 +3,7 @@ import clientSubscriptionController from '../controllers/clientSubscription.cont
 
 const router = Router()
 
+router.get('/', clientSubscriptionController.getAll)
 router.post('/', clientSubscriptionController.create)
 router.get('/client/:id', clientSubscriptionController.getByClient)
 

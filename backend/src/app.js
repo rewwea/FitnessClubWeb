@@ -1,5 +1,6 @@
 import cors from 'cors'
 import express from 'express'
+import authRoutes from './routes/auth.routes.js'
 import clientRoutes from './routes/client.routes.js'
 import clientSubscriptionRoutes from './routes/clientSubscription.routes.js'
 import statsRoutes from './routes/stats.routes.js'
@@ -17,6 +18,7 @@ app.get('/health', (req, res) => {
 	res.json({ status: 'ok' })
 })
 
+app.use('/api/auth', authRoutes)
 app.use('/api/clients', clientRoutes)
 app.use('/api/trainers', trainerRoutes)
 app.use('/api/subscription-types', subscriptionTypeRoutes)
